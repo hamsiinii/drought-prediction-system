@@ -1,0 +1,66 @@
+{
+    "model_type": "STAT-LSTM",
+    "target_column": "NDVI",
+    "feature_columns": [
+        "EVI",
+        "LST",
+        "LST_Night",
+        "Rainfall",
+        "Soil_Moisture",
+        "SPI",
+        "PET",
+        "SPEI",
+        "NDVI_min",
+        "NDVI_max",
+        "VCI",
+        "LST_min",
+        "LST_max",
+        "TCI",
+        "SM_min",
+        "SM_max",
+        "SMCI",
+        "VHI",
+        "SIWSI"
+    ],
+    "lookback": 12,
+    "best_hyperparameters": {
+        "lstm_units_1": 256,
+        "lstm_units_2": 32,
+        "dropout": 0.1,
+        "attention_units": 128,
+        "learning_rate": 0.001
+    },
+    "test_metrics": {
+        "rmse": 562.4213300383351,
+        "mae": 412.24161498090285,
+        "r2": 0.832922124303696
+    },
+    "train_metrics": {
+        "rmse": 491.54757191333687,
+        "mae": 343.8723562886364,
+        "r2": 0.8901210374478896
+    },
+    "val_metrics": {
+        "rmse": 598.6577613785579,
+        "mae": 422.2423689428572,
+        "r2": 0.8275362702159927
+    },
+    "training_date": "2025-12-28 11:06:39",
+    "data_shape": {
+        "train": [
+            165,
+            12,
+            19
+        ],
+        "val": [
+            35,
+            12,
+            19
+        ],
+        "test": [
+            36,
+            12,
+            19
+        ]
+    }
+}

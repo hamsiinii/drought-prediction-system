@@ -1,0 +1,175 @@
+"""
+Database Service - MongoDB & PostgreSQL Integration
+"""
+
+import os
+from motor.motor_asyncio import AsyncIOMotorClient
+from datetime import datetime
+from typing import List, Dict, Optional, Any
+import asyncpg
+from bson import ObjectId
+
+class DatabaseService:
+    def __init__(self):
+        self.mongo_client = None
+        self.mongo_db = None
+        self.postgres_pool = None
+        
+        # Get connection strings from environment
+        self.mongo_uri = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
+        self.postgres_uri = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost/droughtdb")
+    
+    async def connect(self):
+        """Initialize database connections"""
+        try:
+            # MongoDB connection
+            self.mongo_client = AsyncIOMotorClient(self.mongo_uri)
+            self.mongo_db = self.mongo_client.drought_analytics
+            
+            # Test connection
+            await self.mongo_client.admin.command('ping')
+            print("✅ MongoDB connected")
+            
+            # PostgreSQL connection
+            try:
+                self.postgres_pool = await asyncpg.create_pool(self.postgres_uri)
+                print("✅ PostgreSQL connected")
+            except Exception as e:
+                print(f"⚠️  PostgreSQL not available: {e}")
+                print("   Continuing with MongoDB only...")
+                
+        except Exception as e:
+            print(f"❌ Database connection error: {e}")
+            print("   Running without database persistence...")
+    
+    async def disconnect(self):
+        """Close database connections"""
+        if self.mongo_client:
+            self.mongo_client.close()
+        
+        if self.postgres_pool:
+            await self.postgres_pool.close()
+    
+    async def save_prediction(
+        self,
+        prediction_type: str,
+        input_data: Any,
+        result: Dict[str, Any],
+        location: Optional[str] = None
+    ):
+        """Save prediction to MongoDB"""
+        if not self.mongo_db:
+            return None
+        
+        try:
+            document = {
+                "prediction_type": prediction_type,
+                "regcdi_value": result["regcdi_value"],
+                "drought_category": result["drought_category"],
+                "severity_level": result["severity_level"],
+                "confidence_score": result["confidence_score"],
+                "location": location,
+                "input_data": input_data,
+                "created_at": datetime.utcnow(),
+                "model_version": result["model_version"]
+            }
+            
+            collection = self.mongo_db.predictions
+            insert_result = await collection.insert_one(document)
+            
+            return str(insert_result.inserted_id)
+            
+        except Exception as e:
+            print(f"Error saving prediction: {e}")
+            return None
+    
+    async def save_batch_predictions(
+        self,
+        filename: str,
+        predictions: List[Dict[str, Any]]
+    ):
+        """Save batch predictions to MongoDB"""
+        if not self.mongo_db:
+            return None
+        
+        try:
+            document = {
+                "filename": filename,
+                "total_predictions": len(predictions),
+                "predictions": predictions,
+                "uploaded_at": datetime.utcnow()
+            }
+            
+            collection = self.mongo_db.batch_uploads
+            insert_result = await collection.insert_one(document)
+            
+            return str(insert_result.inserted_id)
+            
+        except Exception as e:
+            print(f"Error saving batch: {e}")
+            return None
+    
+    async def get_recent_predictions(
+        self,
+        location: Optional[str] = None,
+        limit: int = 10
+    ) -> List[Dict[str, Any]]:
+        """Get recent predictions with optional location filter"""
+        if not self.mongo_db:
+            return []
+        
+        try:
+            collection = self.mongo_db.predictions
+            
+            query = {}
+            if location:
+                query["location"] = location
+            
+            cursor = collection.find(query).sort("created_at", -1).limit(limit)
+            predictions = await cursor.to_list(length=limit)
+            
+            for pred in predictions:
+                pred["_id"] = str(pred["_id"])
+                pred.pop("input_data", None)
+            
+            return predictions
+            
+        except Exception as e:
+            print(f"Error fetching predictions: {e}")
+            return []
+    
+    async def get_summary_stats(self) -> Dict[str, Any]:
+        """Get summary statistics"""
+        if not self.mongo_db:
+            return {
+                "total_predictions": 0,
+                "message": "Database not connected"
+            }
+        
+        try:
+            collection = self.mongo_db.predictions
+            
+            total = await collection.count_documents({})
+            
+            pipeline = [
+                {
+                    "$group": {
+                        "_id": "$severity_level",
+                        "count": {"$sum": 1}
+                    }
+                }
+            ]
+            
+            distribution_cursor = collection.aggregate(pipeline)
+            distribution = {}
+            async for doc in distribution_cursor:
+                distribution[doc["_id"]] = doc["count"]
+            
+            avg_pipeline = [
+                {
+                    "$group": {
+                        "_id": None,
+                        "avg_regcdi": {"$avg": "$regcdi_value"}
+                    }
+                }
+            ]

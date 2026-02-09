@@ -1,0 +1,70 @@
+{
+  "model_type": "stat-LSTM",
+  "sequence_length": 12,
+  "num_features": 7,
+  "features": [
+    {
+      "name": "rainfall_mm",
+      "description": "Monthly cumulative rainfall",
+      "unit": "mm",
+      "type": "meteorological"
+    },
+    {
+      "name": "tmax_c",
+      "description": "Maximum temperature",
+      "unit": "°C",
+      "type": "meteorological"
+    },
+    {
+      "name": "tmin_c",
+      "description": "Minimum temperature",
+      "unit": "°C",
+      "type": "meteorological"
+    },
+    {
+      "name": "spei",
+      "description": "Standardized Precipitation Evapotranspiration Index",
+      "unit": "index",
+      "type": "meteorological"
+    },
+    {
+      "name": "spi",
+      "description": "Standardized Precipitation Index",
+      "unit": "index",
+      "type": "meteorological"
+    },
+    {
+      "name": "ndvi",
+      "description": "Normalized Difference Vegetation Index",
+      "unit": "index",
+      "type": "agricultural"
+    },
+    {
+      "name": "soil_moisture",
+      "description": "Surface or root-zone soil moisture",
+      "unit": "%",
+      "type": "agricultural"
+    }
+  ],
+  "output": {
+    "name": "REGCDI",
+    "description": "Regional Comprehensive Drought Index",
+    "type": "continuous",
+    "range": [-2, 2],
+    "interpretation": "Higher values indicate more severe drought conditions"
+  },
+  "drought_categories": {
+    "extreme": {"min": -999, "max": -1.0, "label": "Extreme Drought"},
+    "severe": {"min": -1.0, "max": -0.5, "label": "Severe Drought"},
+    "moderate": {"min": -0.5, "max": 0.0, "label": "Moderate Drought"},
+    "mild": {"min": 0.0, "max": 0.5, "label": "Mild Drought"},
+    "no_drought": {"min": 0.5, "max": 999, "label": "No Drought"}
+  },
+  "data_sources": [
+    "Google Earth Engine",
+    "IMD (India Meteorological Department)",
+    "NOAA"
+  ],
+  "created_date": "2025-01-01",
+  "version": "1.0"
+}

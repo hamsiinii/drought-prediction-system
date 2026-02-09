@@ -1,0 +1,39 @@
+# Core Framework
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+
+# Machine Learning (use latest compatible versions)
+tensorflow>=2.16.0
+numpy
+pandas
+scikit-learn
+
+# Database
+motor  # MongoDB async driver
+pymongo
+psycopg2-binary
+sqlalchemy
+
+# Authentication & Security
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+bcrypt
+
+# Utilities
+python-dotenv
+aiofiles
+
+# API Documentation
+httpx
+
+# Logging & Monitoring
+loguru
+
+# Date/Time
+python-dateutil
+
+# For Render deployment
+gunicorn

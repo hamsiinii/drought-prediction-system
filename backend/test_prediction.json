@@ -1,0 +1,17 @@
+{
+  "data": [
+    {"rainfall_mm": 12.5, "tmax_c": 32.4, "tmin_c": 18.2, "spei": -0.85, "spi": -0.72, "ndvi": 0.42, "soil_moisture": 35.2},
+    {"rainfall_mm": 8.3, "tmax_c": 34.1, "tmin_c": 19.5, "spei": -1.12, "spi": -0.95, "ndvi": 0.38, "soil_moisture": 31.8},
+    {"rainfall_mm": 15.7, "tmax_c": 36.8, "tmin_c": 21.3, "spei": -0.95, "spi": -0.78, "ndvi": 0.35, "soil_moisture": 28.5},
+    {"rainfall_mm": 22.4, "tmax_c": 38.2, "tmin_c": 23.7, "spei": -0.68, "spi": -0.52, "ndvi": 0.33, "soil_moisture": 25.3},
+    {"rainfall_mm": 35.6, "tmax_c": 39.5, "tmin_c": 25.1, "spei": -0.42, "spi": -0.31, "ndvi": 0.31, "soil_moisture": 23.8},
+    {"rainfall_mm": 125.8, "tmax_c": 35.3, "tmin_c": 24.6, "spei": 0.15, "spi": 0.28, "ndvi": 0.48, "soil_moisture": 42.5},
+    {"rainfall_mm": 285.4, "tmax_c": 31.2, "tmin_c": 23.4, "spei": 0.85, "spi": 0.92, "ndvi": 0.68, "soil_moisture": 65.3},
+    {"rainfall_mm": 198.6, "tmax_c": 30.8, "tmin_c": 23.1, "spei": 0.72, "spi": 0.68, "ndvi": 0.72, "soil_moisture": 68.7},
+    {"rainfall_mm": 145.3, "tmax_c": 31.5, "tmin_c": 22.8, "spei": 0.45, "spi": 0.38, "ndvi": 0.65, "soil_moisture": 58.2},
+    {"rainfall_mm": 68.7, "tmax_c": 33.2, "tmin_c": 21.5, "spei": 0.12, "spi": 0.08, "ndvi": 0.55, "soil_moisture": 45.8},
+    {"rainfall_mm": 28.4, "tmax_c": 32.8, "tmin_c": 19.8, "spei": -0.35, "spi": -0.42, "ndvi": 0.48, "soil_moisture": 38.5},
+    {"rainfall_mm": 10.2, "tmax_c": 31.5, "tmin_c": 17.6, "spei": -0.68, "spi": -0.75, "ndvi": 0.43, "soil_moisture": 33.2}
+  ],
+  "location": "Vidarbha"
+}

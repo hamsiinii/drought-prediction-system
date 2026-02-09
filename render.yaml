@@ -1,0 +1,43 @@
+services:
+  # Backend API Service
+  - type: web
+    name: drought-api
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "pip install -r backend/requirements.txt"
+    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: MONGODB_URI
+        sync: false # Set this in Render dashboard
+      - key: DATABASE_URL
+        sync: false # Optional PostgreSQL
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ENVIRONMENT
+        value: production
+    healthCheckPath: /health
+
+  # Streamlit Frontend Service
+  - type: web
+    name: drought-dashboard
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: "pip install streamlit pandas plotly requests"
+    startCommand: "streamlit run frontend/streamlit_app.py --server.port $PORT --server.address 0.0.0.0"
+    envVars:
+      - key: API_URL
+        value: https://drought-api.onrender.com # Update after backend deploys
+      - key: PYTHON_VERSION
+        value: 3.11.0
+# MongoDB Atlas (Free tier - setup manually)
+# 1. Go to https://www.mongodb.com/cloud/atlas
+# 2. Create free cluster
+# 3. Get connection string
+# 4. Add to Render environment variables
+
+# PostgreSQL (Optional)
+# Add from Render dashboard: New PostgreSQL database
