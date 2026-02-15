@@ -289,14 +289,6 @@ Contributions are welcome! Please:
 
 This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
 
-## 👨‍💻 Author
-
-**Your Name**
-
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [yourprofile](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
-
 ## 🙏 Acknowledgments
 
 - TensorFlow/Keras for ML framework
@@ -305,18 +297,6 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file.
 - MongoDB Atlas for free database hosting
 - Render for free deployment
 
-## 📚 Citation
-
-If you use this project in your research, please cite:
-
-```bibtex
-@software{drought_prediction_2025,
-  author = {Your Name},
-  title = {Drought Insights & Analytics Microservice},
-  year = {2025},
-  url = {https://github.com/yourusername/drought-prediction-system}
-}
-```
 
 ## 🐛 Known Issues
 
