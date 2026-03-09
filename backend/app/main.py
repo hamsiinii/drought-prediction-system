@@ -11,6 +11,8 @@ import pandas as pd
 import io
 import os
 import sys
+from dotenv import load_dotenv
+load_dotenv()
 
 # Add parent directory to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -140,9 +142,10 @@ async def upload_data(file: UploadFile = File(...)):
         
         # Validate columns
         required_columns = [
-            'rainfall_mm', 'tmax_c', 'tmin_c', 'spei', 
-            'spi', 'ndvi', 'soil_moisture'
-        ]
+    'EVI', 'LST', 'LST_Night', 'Rainfall', 'Soil_Moisture',
+    'SPI', 'PET', 'SPEI', 'NDVI_min', 'NDVI_max', 'VCI',
+    'LST_min', 'LST_max', 'TCI', 'SM_min', 'SM_max', 'SMCI', 'VHI', 'SIWSI'
+]
         
         missing_cols = set(required_columns) - set(df.columns)
         if missing_cols:

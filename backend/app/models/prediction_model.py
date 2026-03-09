@@ -1,131 +1,51 @@
 """
-Pydantic Models for Request/Response Validation
+Pydantic models - 19 features matching Vidarbha GEE training data
+Target: NDVI (raw GEE pixel sum, range ~1900-7348)
 """
 
-from pydantic import BaseModel, Field, validator
-from typing import List, Dict, Optional, Any
-from datetime import datetime
-from enum import Enum
+from pydantic import BaseModel, Field
+from typing import List, Optional
 
-class DroughtCategory(str, Enum):
-    """Drought severity categories"""
-    NO_DROUGHT = "No Drought"
-    MILD = "Mild Drought"
-    MODERATE = "Moderate Drought"
-    SEVERE = "Severe Drought"
-    EXTREME = "Extreme Drought"
 
-class MonthlyFeatures(BaseModel):
-    """Single month's feature data"""
-    rainfall_mm: float = Field(..., description="Monthly cumulative rainfall (mm)")
-    tmax_c: float = Field(..., description="Maximum temperature (°C)")
-    tmin_c: float = Field(..., description="Minimum temperature (°C)")
-    spei: float = Field(..., description="Standardized Precipitation Evapotranspiration Index")
-    spi: float = Field(..., description="Standardized Precipitation Index")
-    ndvi: float = Field(..., description="Normalized Difference Vegetation Index", ge=0, le=1)
-    soil_moisture: float = Field(..., description="Soil moisture (%)", ge=0, le=100)
-    
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "rainfall_mm": 85.5,
-                "tmax_c": 32.4,
-                "tmin_c": 18.2,
-                "spei": -0.5,
-                "spi": -0.3,
-                "ndvi": 0.65,
-                "soil_moisture": 45.0
-            }
-        }
+class MonthlyDataPoint(BaseModel):
+    """One month of Vidarbha climate/vegetation data — exact training feature order"""
+    EVI:          float = Field(..., description="Enhanced Vegetation Index (GEE pixel sum ~1100-5200)")
+    LST:          float = Field(..., description="Land Surface Temperature day (°C ~26-50)")
+    LST_Night:    float = Field(..., description="Land Surface Temperature night (°C ~12-29)")
+    Rainfall:     float = Field(..., ge=0.0, description="Monthly rainfall mm (~0-18)")
+    Soil_Moisture:float = Field(..., description="Soil moisture fraction (0.20-0.46)")
+    SPI:          float = Field(..., description="Standardized Precipitation Index (-3 to 3)")
+    PET:          float = Field(..., description="Potential Evapotranspiration mm (~70-262)")
+    SPEI:         float = Field(..., description="Standardized Precip Evapotranspiration Index")
+    NDVI_min:     float = Field(..., description="NDVI min pixel sum reference (~1900-3560)")
+    NDVI_max:     float = Field(..., description="NDVI max pixel sum reference (~3822-7348)")
+    VCI:          float = Field(..., ge=0.0, le=100.0, description="Vegetation Condition Index %")
+    LST_min:      float = Field(..., description="LST minimum reference °C")
+    LST_max:      float = Field(..., description="LST maximum reference °C")
+    TCI:          float = Field(..., ge=0.0, le=100.0, description="Temperature Condition Index %")
+    SM_min:       float = Field(..., description="Soil Moisture minimum reference")
+    SM_max:       float = Field(..., description="Soil Moisture maximum reference")
+    SMCI:         float = Field(..., ge=0.0, le=100.0, description="Soil Moisture Condition Index %")
+    VHI:          float = Field(..., ge=0.0, le=100.0, description="Vegetation Health Index %")
+    SIWSI:        float = Field(..., description="Shortwave Infrared Water Stress Index (0.16-0.74)")
+
 
 class ManualPredictionRequest(BaseModel):
-    """Request for manual prediction (12 months of data)"""
-    data: List[MonthlyFeatures] = Field(..., min_length=12, max_length=12)
-    location: Optional[str] = Field(None, description="Location identifier")
-    
-    @validator('data')
-    def validate_data_length(cls, v):
-        if len(v) != 12:
-            raise ValueError('Exactly 12 months of data required')
-        return v
-    
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "data": [
-                    {
-                        "rainfall_mm": 85.5,
-                        "tmax_c": 32.4,
-                        "tmin_c": 18.2,
-                        "spei": -0.5,
-                        "spi": -0.3,
-                        "ndvi": 0.65,
-                        "soil_moisture": 45.0
-                    }
-                    # ... repeat for 12 months
-                ],
-                "location": "Maharashtra"
-            }
-        }
+    data:     List[MonthlyDataPoint] = Field(..., min_length=12, max_length=12)
+    location: Optional[str] = None
+
 
 class PredictionResponse(BaseModel):
-    """Response from prediction endpoint"""
-    regcdi_value: float = Field(..., description="Predicted REGCDI value")
-    drought_category: str = Field(..., description="Drought severity category")
-    severity_level: str = Field(..., description="Severity level (no_drought, mild, moderate, severe, extreme)")
-    confidence_score: float = Field(..., ge=0, le=1, description="Prediction confidence (0-1)")
-    prediction_date: str = Field(..., description="Timestamp of prediction")
-    model_version: str = Field(..., description="Model version used")
-    
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "regcdi_value": -0.65,
-                "drought_category": "Moderate Drought",
-                "severity_level": "moderate",
-                "confidence_score": 0.82,
-                "prediction_date": "2025-01-15T10:30:00Z",
-                "model_version": "stat-LSTM-v1.0"
-            }
-        }
+    regcdi_value:     float
+    drought_category: str
+    severity_level:   str
+    confidence_score: float
+    model_version:    str
+    prediction_date:  str
 
-class BatchPredictionResponse(BaseModel):
-    """Response for batch predictions"""
-    total_predictions: int
-    predictions: List[PredictionResponse]
-    filename: Optional[str] = None
-    uploaded_at: str
 
 class HealthResponse(BaseModel):
-    """Health check response"""
-    status: str = Field(..., description="Service status")
-    model_loaded: bool = Field(..., description="Whether ML model is loaded")
-    timestamp: str = Field(..., description="Current server timestamp")
-    version: str = Field(..., description="API version")
-    
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "status": "healthy",
-                "model_loaded": True,
-                "timestamp": "2025-01-15T10:30:00Z",
-                "version": "1.0.0"
-            }
-        }
-
-class SummaryStats(BaseModel):
-    """System summary statistics"""
-    total_predictions: int
-    drought_distribution: Dict[str, int]
-    average_regcdi: float
-    last_prediction_date: Optional[str]
-    
-class PredictionHistory(BaseModel):
-    """Historical prediction record"""
-    id: str
-    prediction_type: str  # 'manual' or 'batch'
-    regcdi_value: float
-    drought_category: str
-    location: Optional[str]
-    created_at: str
-    input_summary: Optional[Dict[str, Any]]
+    status:       str
+    model_loaded: bool
+    timestamp:    str
+    version:      str

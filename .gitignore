@@ -83,3 +83,9 @@ Thumbs.db
 node_modules/
 npm-debug.log
 yarn-error.log
+
+frontend/streamlit_app_v1.py
+frontend/streamlit_appv2.py
+backend/app/services/database_servicev1.py
+backend/app/services/database_service.py.backup
+
